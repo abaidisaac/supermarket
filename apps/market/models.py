@@ -5,9 +5,9 @@ from django.db.models.deletion import CASCADE
 
 class Product(models.Model):
 
-    user = models.ForeignKey(User, on_delete=CASCADE)
-    title = models.TextField(max_length=20)
-    quantity = models.TextField(max_length=20)
+    user = models.ForeignKey(User, on_delete=CASCADE, null=True)
+    title = models.TextField(max_length=20, null=True)
+    quantity = models.TextField(max_length=20, null=True)
 
     def __str__(self):
         return str(self.user)
