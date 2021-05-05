@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <title>Supermarket</title>
+</head>
+
+<body>
+    <div class="">
+        <div class="m-4">
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+            <div class="container">
+                <input type="text" class="form-control" placeholder="Enter Item " id="title">
+                <input type="text" class="form-control" placeholder="Enter Quantity" id="quantity">
+                <button class="btn btn-success" onclick="post()">Add Item</button>
+            </div>
+        </div>
+        <div class="container" id='container'>
+
+        </div>
+    </div>
+
+    <script>
+        function token() {
+            var cookie = document.cookie.split(';');
+            for (var i = 0; i < cookie.length; i++) {
+                var pair = cookie[i].split('=')
+                if (pair[0] = "access_token") {
+                    var token = pair[1]
+                }
+            }
+            return token
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            cookie = token()
+            $.ajax({
+                url: "get",
+                type: 'GET',
+                headers: {
+                    "Authorization": "Bearer " + cookie
+                },
+                success: function (response) {
+                    for (i = 0; i < response.length; i++) {
+                        $(container).append("<div class='card m-3' id='card" + response[i].id + "'><div class='card-body'><div class='row'><div class='col'><h3 class='card-title m-1' id=title" + response[i].id + ">" + response[i].title + "</h5><p class='card-text m-1' id='quantity" + response[i].id + "'>" + response[i].quantity + "</p></div><div class='col'><input type='text' class='form-control' placeholder='Update Item' id='tup" + response[i].id + "'><input type='text' class='form-control' placeholder='Update Quantity' id='qup" + response[i].id + "'><button class='btn btn-secondary' onclick='update(" + response[i].id + ")'>Update</button></div><div><button class='btn btn-secondary' onclick='del(" + response[i].id + ")'>Delete</button></div></div></div></div>")
+                    }
+                }
+            })
+        })
+    </script>
+
+    <script>
+        function post() {
+            cookie = token()
+            $.ajax({
+                url: "post",
+                type: 'POST',
+                headers: {
+                    "Authorization": "Bearer " + cookie
+                },
+                data: {
+                    "title": document.getElementById('title').value,
+                    "quantity": document.getElementById('quantity').value
+                },
+                success: function (response) {
+                    $(container).append("<div class='card m-3' id='card" + response + "'><div class='card-body'><div class='row'><div class='col'><h3 class='card-title m-1' id=title" + response + ">" + document.getElementById('title').value + "</h5><p class='card-text m-1' id='quantity" + response + "'>" + document.getElementById('quantity').value + "</p></div><div class='col'><input type='text' class='form-control' placeholder='Update Item' id='tup" + response + "'><input type='text' class='form-control' placeholder='Update Quantity' id='qup" + response + "'><button class='btn btn-secondary' onclick='update(" + response + ")'>Update</button></div><div><button class='btn btn-secondary' onclick='del(" + response + ")'>Delete</button></div></div></div></div>")
+                }
+            })
+        }
+    </script>
+    <script>
+        function logout() {
+            document.cookie = "access_token= "
+            window.location.href = '/'
+        }
+    </script>
+
+    <script>
+        function update(id) {
+            cookie = token()
+            if (document.getElementById('tup' + id).value != "") {
+                var title = document.getElementById('tup' + id).value
+            }
+            else {
+                var title = document.getElementById('title' + id).innerHTML
+            }
+            if (document.getElementById('qup' + id).value != "") {
+                var quantity = document.getElementById('qup' + id).value
+            }
+            else {
+                var quantity = document.getElementById('quantity' + id).innerHTML
+            }
+            console.log(quantity)
+            $.ajax({
+                url: "update/" + id,
+                type: 'PUT',
+                headers: {
+                    "Authorization": "Bearer " + cookie
+                },
+                data: {
+                    "id": id,
+                    "title": title,
+                    "quantity": quantity
+                },
+                success: function (response) {
+                    if (document.getElementById('tup' + id).value != "") {
+                        document.getElementById("title" + id).innerHTML = document.getElementById('tup' + id).value
+                    }
+                    if (document.getElementById('qup' + id).value != "") {
+                        document.getElementById("quantity" + id).innerHTML = document.getElementById('qup' + id).value
+                    }
+                }
+            })
+        }
+    </script>
+    <script>
+        function del(id) {
+            cookie = token()
+            $.ajax({
+                url: "delete/" + id,
+                type: 'DELETE',
+                headers: {
+                    "Authorization": "Bearer " + cookie
+                },
+                success: function (response) {
+                    document.getElementById('card' + id).remove()
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
